@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: 9f5481c99bdcc7e41abe3483b0007929
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Espera
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: f13a3bca6b3b29848b314c76a46b858b, type: 3}
+  - {fileID: 12800000, guid: 021749a6dbaed34468fde2b6b05df04f, type: 3}
+  - {fileID: 12800000, guid: 958a4cd273f03a2458df73573e21920e, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

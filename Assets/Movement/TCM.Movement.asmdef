@@ -1,0 +1,17 @@
+{
+    "name": "TCM.Movement",
+    "rootNamespace": "TCM",
+    "references": [
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:9cd54bc674ca2f14aa769413dacf88b0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
