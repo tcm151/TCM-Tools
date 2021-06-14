@@ -23,7 +23,6 @@ namespace TCM.Planets
         private List<Vector3> normals;
         private List<int> triangles;
 
-        private NoiseFilter[] noiseGenerators;
         private Planet.Data planetData;
 
         public Range elevationRange;
@@ -36,8 +35,6 @@ namespace TCM.Planets
             this.meshFilter = GetComponent<MeshFilter>();
             this.meshRenderer = GetComponent<MeshRenderer>();
             this.meshCollider = GetComponent<MeshCollider>();
-            this.noiseGenerators = new NoiseFilter[planetData.noiseLayers.Count];
-            for (int i = 0; i < noiseGenerators.Length; i++) noiseGenerators[i] = new NoiseFilter();
 
             this.Up = up;
             this.planetData = planetData;
@@ -132,45 +129,7 @@ namespace TCM.Planets
         }
         
         //> RETRIANGULATE THIS CHUNK WITH SAME RESOLUTIONS
-        public void Retriangulate()
-        {
-            var resolution = planetData.meshResolution;
-
-            //- Loop over every vertex
-            for (int i = 0, t = 0, y = 0; y < resolution; y++) {
-                for (int x = 0; x < resolution; i++, x++)
-                {
-                    Vector2 percent = (new Vector2(x, y) / (resolution - 1) * chunkPercent) + chunkOffset;
-                    Vector3 position = Up + ((percent.x - 0.5f) * 2 * Right) + ((percent.y - 0.5f) * 2 * Forward);
-
-                    //- Better method for converting unit cube to unit sphere
-                    float xSquared = position.x * position.x;
-                    float ySquared = position.y * position.y;
-                    float zSquared = position.z * position.z;
-                    Vector3 positionNormalized = new Vector3
-                    {
-                        x = position.x * Mathf.Sqrt(1f - (ySquared / 2f) - (zSquared / 2f) + (ySquared * zSquared / 3f)),
-                        y = position.y * Mathf.Sqrt(1f - (xSquared / 2f) - (zSquared / 2f) + (xSquared * zSquared / 3f)),
-                        z = position.z * Mathf.Sqrt(1f - (xSquared / 2f) - (ySquared / 2f) + (xSquared * ySquared / 3f)),
-                    };
-
-                    normals[i] = positionNormalized;
-                    vertices[i] = GetElevation(positionNormalized);
-
-                    //~ skip if on edge of mesh
-                    if ((x == resolution - 1) || (y == resolution - 1)) continue;
-
-                    // add the two respective triangles
-                    triangles[t + 0] = i;
-                    triangles[t + 1] = i + resolution + 1;
-                    triangles[t + 2] = i + resolution;
-                    triangles[t + 3] = i;
-                    triangles[t + 4] = i + 1;
-                    triangles[t + 5] = i + resolution + 1;
-                    t += 6;
-                }
-            }
-        }
+        public void Retriangulate() => Triangulate();
 
         //> GET THE ELEVATION AT ANY GIVEN POINT
         public Vector3 GetElevation(Vector3 position)
@@ -178,19 +137,19 @@ namespace TCM.Planets
             float elevation = 0f;
             float firstLayerElevation = 0f;
 
-            if (noiseGenerators.Length > 0)
+            if (planetData.noiseLayers.Count > 0)
             {
-                firstLayerElevation = noiseGenerators[0].GetValue(planetData.noiseLayers[0], position);
+                firstLayerElevation = Noise.GenerateValue(planetData.noiseLayers[0], position);
                 if (planetData.noiseLayers[0].enabled) elevation = firstLayerElevation;
             }
 
-            for (int i = 1; i < noiseGenerators.Length; i++)
+            for (int i = 1; i < planetData.noiseLayers.Count; i++)
             {
                 // ignore if not enabled
                 if (!planetData.noiseLayers[i].enabled) continue;
 
                 float firstLayerMask = (planetData.noiseLayers[i].useMask) ? firstLayerElevation : 1;
-                elevation += (noiseGenerators[i].GetValue(planetData.noiseLayers[i], position) * firstLayerMask);
+                elevation += (Noise.GenerateValue(planetData.noiseLayers[i], position) * firstLayerMask);
             }
 
             elevation = (planetData.radius + (250 * elevation));

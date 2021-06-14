@@ -18,11 +18,11 @@ namespace TCM
             var newPlanetData = new Planet.Data
             {
                 material = planetMaterial,
-                colorGradient = planetGradient,
+                terrainGradient = planetGradient,
                 textureResolution = 64,
                 
                 radius = 5000,
-                noiseLayers = new List<NoiseFilter.Settings>(),
+                noiseLayers = new List<Noise.Layer>(),
                 
                 chunkResolution = 16,
                 meshResolution = 16,

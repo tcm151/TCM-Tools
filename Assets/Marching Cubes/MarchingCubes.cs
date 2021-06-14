@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-namespace TCM
+namespace TCM.MarchingCubes
 {
     public class Triangle
     {
@@ -10,13 +10,13 @@ namespace TCM
     
     public class GridCell
     {
-        public Vector3[] points = new Vector3[8];
-        public float[] values = new float[8];
+        public Vector3[] point = new Vector3[8];
+        public float[] value = new float[8];
     }
     
     public static class MarchingCubes
     {
-        private static readonly int[][] TriangleTable = 
+        public static readonly int[][] TriangleLookup = 
         {
             new [] {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
             new [] { 0,  8,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -276,7 +276,7 @@ namespace TCM
             new [] {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
         };
         
-        private static readonly int[] EdgeTable =
+        public static readonly int[] EdgeTable =
         {
             0x000, 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
             0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00,
@@ -312,61 +312,59 @@ namespace TCM
             0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x000,
         };
 
-        //> For a given GridCell and resolution, calculate the triangles required to represent the volume of the cell.
-        //> Returns the number of triangles, the triangles array will be loaded up with the vertices of at most 5 triangles.
-        //> ZERO will be returned if the GridCell is not contained within the volume
-        private static int Render(GridCell grid, float resolution, Triangle[] triangles)
+        //> For a given GridCell and localZero, calculate the triangles required to represent the volume of the cell.
+        //- The triangles array will be loaded up with the vertices of at most 5 triangles.
+        //- ZERO will be returned if the GridCell is not contained within the volume.
+        private static void Render(GridCell cell, float localZero, Triangle[] vertices)
         {
-            Vector3[] vertexList = new Vector3[12];
+            Vector3[] edge = new Vector3[12];
             
             //- Determine the index into the edge table which tells us which vertices are inside of the surface
-            int cubeIndex = 0;
-            if (grid.values[0] < resolution) cubeIndex |= 1;
-            if (grid.values[1] < resolution) cubeIndex |= 2;
-            if (grid.values[2] < resolution) cubeIndex |= 4;
-            if (grid.values[3] < resolution) cubeIndex |= 8;
-            if (grid.values[4] < resolution) cubeIndex |= 16;
-            if (grid.values[5] < resolution) cubeIndex |= 32;
-            if (grid.values[6] < resolution) cubeIndex |= 64;
-            if (grid.values[7] < resolution) cubeIndex |= 128;
+            int configuration = 0;
+            if (cell.value[0] < localZero) configuration |= 1;
+            if (cell.value[1] < localZero) configuration |= 2;
+            if (cell.value[2] < localZero) configuration |= 4;
+            if (cell.value[3] < localZero) configuration |= 8;
+            if (cell.value[4] < localZero) configuration |= 16;
+            if (cell.value[5] < localZero) configuration |= 32;
+            if (cell.value[6] < localZero) configuration |= 64;
+            if (cell.value[7] < localZero) configuration |= 128;
 
             //- Cube is entirely in/out of the surface
-            if (EdgeTable[cubeIndex] == 0) return (0);
+            if (EdgeTable[configuration] == 0) return;
 
             //- Find the vertices where the surface intersects the cube
-            if ((EdgeTable[cubeIndex] & 0001) == 1) vertexList[00] = Interpolate(resolution, grid.points[0], grid.points[1], grid.values[0], grid.values[1]);
-            if ((EdgeTable[cubeIndex] & 0002) == 1) vertexList[01] = Interpolate(resolution, grid.points[1], grid.points[2], grid.values[1], grid.values[2]);
-            if ((EdgeTable[cubeIndex] & 0004) == 1) vertexList[02] = Interpolate(resolution, grid.points[2], grid.points[3], grid.values[2], grid.values[3]);
-            if ((EdgeTable[cubeIndex] & 0008) == 1) vertexList[03] = Interpolate(resolution, grid.points[3], grid.points[0], grid.values[3], grid.values[0]);
-            if ((EdgeTable[cubeIndex] & 0016) == 1) vertexList[04] = Interpolate(resolution, grid.points[4], grid.points[5], grid.values[4], grid.values[5]);
-            if ((EdgeTable[cubeIndex] & 0032) == 1) vertexList[05] = Interpolate(resolution, grid.points[5], grid.points[6], grid.values[5], grid.values[6]);
-            if ((EdgeTable[cubeIndex] & 0064) == 1) vertexList[06] = Interpolate(resolution, grid.points[6], grid.points[7], grid.values[6], grid.values[7]);
-            if ((EdgeTable[cubeIndex] & 0128) == 1) vertexList[07] = Interpolate(resolution, grid.points[7], grid.points[4], grid.values[7], grid.values[4]);
-            if ((EdgeTable[cubeIndex] & 0256) == 1) vertexList[08] = Interpolate(resolution, grid.points[0], grid.points[4], grid.values[0], grid.values[4]);
-            if ((EdgeTable[cubeIndex] & 0512) == 1) vertexList[09] = Interpolate(resolution, grid.points[1], grid.points[5], grid.values[1], grid.values[5]);
-            if ((EdgeTable[cubeIndex] & 1024) == 1) vertexList[10] = Interpolate(resolution, grid.points[2], grid.points[6], grid.values[2], grid.values[6]);
-            if ((EdgeTable[cubeIndex] & 2048) == 1) vertexList[11] = Interpolate(resolution, grid.points[3], grid.points[7], grid.values[3], grid.values[7]);
+            if ((EdgeTable[configuration] & 0001) == 1) edge[00] = Interpolate(localZero, cell.point[0], cell.point[1], cell.value[0], cell.value[1]);
+            if ((EdgeTable[configuration] & 0002) == 1) edge[01] = Interpolate(localZero, cell.point[1], cell.point[2], cell.value[1], cell.value[2]);
+            if ((EdgeTable[configuration] & 0004) == 1) edge[02] = Interpolate(localZero, cell.point[2], cell.point[3], cell.value[2], cell.value[3]);
+            if ((EdgeTable[configuration] & 0008) == 1) edge[03] = Interpolate(localZero, cell.point[3], cell.point[0], cell.value[3], cell.value[0]);
+            if ((EdgeTable[configuration] & 0016) == 1) edge[04] = Interpolate(localZero, cell.point[4], cell.point[5], cell.value[4], cell.value[5]);
+            if ((EdgeTable[configuration] & 0032) == 1) edge[05] = Interpolate(localZero, cell.point[5], cell.point[6], cell.value[5], cell.value[6]);
+            if ((EdgeTable[configuration] & 0064) == 1) edge[06] = Interpolate(localZero, cell.point[6], cell.point[7], cell.value[6], cell.value[7]);
+            if ((EdgeTable[configuration] & 0128) == 1) edge[07] = Interpolate(localZero, cell.point[7], cell.point[4], cell.value[7], cell.value[4]);
+            if ((EdgeTable[configuration] & 0256) == 1) edge[08] = Interpolate(localZero, cell.point[0], cell.point[4], cell.value[0], cell.value[4]);
+            if ((EdgeTable[configuration] & 0512) == 1) edge[09] = Interpolate(localZero, cell.point[1], cell.point[5], cell.value[1], cell.value[5]);
+            if ((EdgeTable[configuration] & 1024) == 1) edge[10] = Interpolate(localZero, cell.point[2], cell.point[6], cell.value[2], cell.value[6]);
+            if ((EdgeTable[configuration] & 2048) == 1) edge[11] = Interpolate(localZero, cell.point[3], cell.point[7], cell.value[3], cell.value[7]);
 
             
             //- Create the triangle
-            int newTriangle = 0;
-            for (int i = 0; TriangleTable[cubeIndex][i] != -1; i += 3)
+            int triangle = 0;
+            for (int i = 0; TriangleLookup[configuration][i] != -1; i += 3)
             {
-                triangles[newTriangle].points[0] = vertexList[TriangleTable[cubeIndex][i + 0]];
-                triangles[newTriangle].points[1] = vertexList[TriangleTable[cubeIndex][i + 1]];
-                triangles[newTriangle].points[2] = vertexList[TriangleTable[cubeIndex][i + 2]];
-                newTriangle++;
+                vertices[triangle].points[0] = edge[TriangleLookup[configuration][i + 0]];
+                vertices[triangle].points[1] = edge[TriangleLookup[configuration][i + 1]];
+                vertices[triangle].points[2] = edge[TriangleLookup[configuration][i + 2]];
+                triangle++;
             }
-
-            return newTriangle;
         }
 
        //> Linearly interpolate the position where an iso-surface cuts an edge between two vertices, each with their own scalar value
-        private static Vector3 Interpolate(float resolution, Vector3 point1, Vector3 point2, float value1, float value2)
+        public static Vector3 Interpolate(float resolution, Vector3 point1, Vector3 point2, float value1, float value2)
         {
-            if (Mathf.Abs((resolution - value1)) < 0.00001) return (point1);
-            if (Mathf.Abs((resolution - value2)) < 0.00001) return (point2);
-            if (Mathf.Abs((  value1   - value2)) < 0.00001) return (point1);
+            if (Mathf.Abs((resolution - value1)) < 0.00001) return point1;
+            if (Mathf.Abs((resolution - value2)) < 0.00001) return point2;
+            if (Mathf.Abs((  value1   - value2)) < 0.00001) return point1;
             
             float mu = (resolution - value1) / (value2 - value1);
             

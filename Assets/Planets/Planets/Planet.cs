@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.IO;
+using UnityEngine.Serialization;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
 
@@ -14,16 +16,24 @@ namespace TCM.Planets
         [System.Serializable]
         public class Data
         {
-            [Header("Color")] public Material material;
-            public Gradient colorGradient;
+            [Header("Color")]
+            public Material material;
+            public Gradient terrainGradient;
+            public Gradient underwaterGradient;
             public int textureResolution = 64;
 
             [Header("Shape")] public int radius = 150;
-            public List<NoiseFilter.Settings> noiseLayers;
+            public List<Noise.Layer> noiseLayers;
             
             [Header("Mesh Generation")]
             [Range(1, 32)] public int chunkResolution = 4;
             [Range(16, 256)] public int meshResolution = 16;
+
+            //> SAVE THE DATA TO DISK
+            public void Serialize()
+            {
+                
+            }
         }
 
         public Data planetData;
@@ -40,8 +50,10 @@ namespace TCM.Planets
         private void Initialize()
         {
             // cleanup old game objects
-            foreach (var chunk in chunks.Where(chunk => chunk)) DestroyImmediate(chunk.gameObject);
-            foreach (var face in faces.Where(face => face)) DestroyImmediate(face.gameObject);
+            foreach (var chunk in chunks.Where(chunk => chunk))
+                DestroyImmediate(chunk.gameObject);
+            foreach (var face in faces.Where(face => face))
+                DestroyImmediate(face.gameObject);
             chunks.Clear();
             faces.Clear();
 
@@ -155,31 +167,46 @@ namespace TCM.Planets
             return closestChunk;
         }
 
-        [SerializeField, HideInInspector] private Color[] colors;
-        [SerializeField, HideInInspector] private Texture2D colorTexture;
+        [SerializeField, HideInInspector] private Color[] terrainColors;
+        [SerializeField, HideInInspector] private Color[] underwaterColors;
+        [SerializeField, HideInInspector] private Texture2D terrainTexture;
+        [SerializeField, HideInInspector] private Texture2D underwaterTexture;
         
-        private static readonly int ColorTextureID = Shader.PropertyToID("Color_Texture");
         private static readonly int ElevationRangeID = Shader.PropertyToID("Elevation_Range");
+        private static readonly int TerrainTextureID = Shader.PropertyToID("Terrain_Texture");
+        private static readonly int UnderwaterTextureID = Shader.PropertyToID("Underwater_Texture");
 
         //> APPLY COLOR TO THE PLANET
         public void ApplyColors()
         {
-            colors = new Color[planetData.textureResolution];
-            colorTexture = new Texture2D(planetData.textureResolution, 1);
+            terrainColors = new Color[planetData.textureResolution];
+            terrainTexture = new Texture2D(planetData.textureResolution, 1);
+            
+            underwaterColors = new Color[planetData.textureResolution];
+            underwaterTexture = new Texture2D(planetData.textureResolution, 1);
 
             for (int i = 0; i < planetData.textureResolution; i++)
             {
-                colors[i] = planetData.colorGradient.Evaluate(i / (planetData.textureResolution - 1f));
-                colorTexture.SetPixels(colors);
-                colorTexture.Apply();
-                // File.WriteAllBytes(Application.dataPath + "/Planets/Graphics/planetTexture.png", colorTexture.EncodeToPNG());
+                terrainColors[i] = planetData.terrainGradient.Evaluate(i / (planetData.textureResolution - 1f));
+                terrainTexture.SetPixels(terrainColors);
+                terrainTexture.Apply();
+                // File.WriteAllBytes(Application.dataPath + "/Planets/Graphics/terrainTexture.png", terrainTexture.EncodeToPNG());
+            }
+            
+            for (int i = 0; i < planetData.textureResolution; i++)
+            {
+                underwaterColors[i] = planetData.underwaterGradient.Evaluate(i / (planetData.textureResolution - 1f));
+                underwaterTexture.SetPixels(underwaterColors);
+                underwaterTexture.Apply();
+                // File.WriteAllBytes(Application.dataPath + "/Planets/Graphics/underwaterTexture.png", underwaterTexture.EncodeToPNG());
             }
 
             var elevationRange = new Range();
             foreach (var chunk in chunks) elevationRange += chunk.elevationRange;
 
             planetData.material.SetVector(ElevationRangeID, new Vector4(elevationRange.min, elevationRange.max));
-            planetData.material.SetTexture(ColorTextureID, colorTexture);
+            planetData.material.SetTexture(TerrainTextureID, terrainTexture);
+            planetData.material.SetTexture(UnderwaterTextureID, underwaterTexture);
         }
 
         //> PLANET RELATIVE DIRECTIONS
