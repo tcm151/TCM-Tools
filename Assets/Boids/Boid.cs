@@ -8,8 +8,8 @@ namespace TCM
     [RequireComponent(typeof(Rigidbody))]
     public class Boid : MonoBehaviour
     {
-        new private Rigidbody rigidbody;
-        new private Transform transform;
+        private Rigidbody rigidbody;
+        private Transform transform;
         private Vector3 forward;
 
         public float speed = 2f;

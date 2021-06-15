@@ -104,7 +104,7 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
-    - Elevation_Range: {r: 4229.132, g: 5396.8057, b: 0, a: 0}
+    - Elevation_Range: {r: 5000, g: 5888.7983, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

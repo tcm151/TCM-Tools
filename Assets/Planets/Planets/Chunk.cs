@@ -149,7 +149,7 @@ namespace TCM.Planets
                 if (!planetData.noiseLayers[i].enabled) continue;
 
                 float firstLayerMask = (planetData.noiseLayers[i].useMask) ? firstLayerElevation : 1;
-                elevation += (Noise.GenerateValue(planetData.noiseLayers[i], position) * firstLayerMask);
+                elevation += Noise.GenerateValue(planetData.noiseLayers[i], position) * firstLayerMask;
             }
 
             elevation = (planetData.radius + (250 * elevation));

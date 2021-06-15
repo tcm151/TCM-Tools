@@ -9,9 +9,12 @@ namespace TCM
     {
         [Range(7500, 15000)] public float radius = 7500f;
         [Range(0.1f, 15.0f)] public float rotationSpeed = 1f;
-        
+
+        public Sun sun;
         new private Transform transform;
 
+        private void OnValidate() => sun.rotationSpeed = rotationSpeed;
+        
         private void Awake()
         {
             transform = GetComponent<Transform>();
