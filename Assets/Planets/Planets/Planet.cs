@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.IO;
-using UnityEngine.Serialization;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
 
@@ -32,7 +30,7 @@ namespace TCM.Planets
             //> SAVE THE DATA TO DISK
             public void Serialize()
             {
-                
+                //@ DEVISE A WAY TO SAVE PLANET DATA TO FILE 
             }
         }
 
@@ -50,10 +48,8 @@ namespace TCM.Planets
         private void Initialize()
         {
             // cleanup old game objects
-            foreach (var chunk in chunks.Where(chunk => chunk))
-                DestroyImmediate(chunk.gameObject);
-            foreach (var face in faces.Where(face => face))
-                DestroyImmediate(face.gameObject);
+            foreach (var chunk in chunks.Where(chunk => chunk)) DestroyImmediate(chunk.gameObject);
+            foreach (var face in faces.Where(face => face)) DestroyImmediate(face.gameObject);
             chunks.Clear();
             faces.Clear();
 
@@ -106,35 +102,10 @@ namespace TCM.Planets
             }
         }
 
-        // //> GENERATE PLANET WITH A DELAYED COROUTINE
-        // public IEnumerator GeneratePlanetCoroutine(float delay)
-        // {
-        //     Initialize();
-        //     foreach (var chunk in chunks)
-        //     {
-        //         chunk.Triangulate();
-        //         chunk.Apply();
-        //         yield return new WaitForSeconds(delay);
-        //     }
-        //     ApplyColors();
-        // }
+        //> TRIANGULATE ALL CHUNKS
+        public void TriangulateChunks() => TriangulateChunks(chunks);
 
-        //> TRIANGULATE EACH FACE (MULTITHREADED)
-        public void TriangulateChunks()
-        {
-            Task[] triangulations = new Task[chunks.Count];
-            for (int i = 0; i < chunks.Count; i++)
-            {
-                int j = i;
-                triangulations[j] = Task.Factory.StartNew(() => chunks[j].Triangulate());
-            }
-            Task.WaitAll(triangulations, 5000);
-
-            // apply triangulations on main thread
-            foreach (var chunk in chunks) chunk.Apply();
-        }
-
-        //> TRIANGULATE A CERTAIN SUBSET OF CHUNKS
+        //> TRIANGULATE A LIST OF CHUNKS (MULTI-THREADED)
         private static void TriangulateChunks(IReadOnlyList<Chunk> chunks)
         {
             Task[] triangulations = new Task[chunks.Count];
@@ -210,6 +181,11 @@ namespace TCM.Planets
         }
 
         //> PLANET RELATIVE DIRECTIONS
-        private static readonly Vector3[] Directions = {Vector3.up, Vector3.forward, Vector3.right, Vector3.back, Vector3.left, Vector3.down,};
+        private static readonly Vector3[] Directions =
+        {
+            Vector3.up,    Vector3.forward,
+            Vector3.right, Vector3.back,
+            Vector3.left,  Vector3.down,
+        };
     }
 }

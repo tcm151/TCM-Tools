@@ -9,7 +9,7 @@ namespace TCM.Planets
     {
         private SerializedProperty enabled, mask, type, octaves, strength,
                                    baseRoughness, roughness, persistence, localZero, offset;
-
+        
         //> INSPECTOR GUI
         override public void OnGUI(Rect rect, SerializedProperty property, GUIContent title)
         {

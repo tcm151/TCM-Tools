@@ -25,6 +25,5 @@ namespace TCM
 
         public static Vector3Int FloorToInt(this Vector3 v) => new Vector3Int {x = Mathf.FloorToInt(v.x), y = Mathf.FloorToInt(v.y), z = Mathf.FloorToInt(v.z)};
 
-        // static public void Start(this MonoBehaviour s, IEnumerator activity) => s.StartCoroutine(activity);
     }
 }

@@ -49,17 +49,18 @@ namespace TCM.Planets
             
             normals = new List<Vector3>(new Vector3[planetData.meshResolution * planetData.meshResolution]);
             vertices = new List<Vector3>(new Vector3[planetData.meshResolution * planetData.meshResolution]);
-            triangles = new List<int>(new int [(planetData.meshResolution - 1) * (planetData.meshResolution - 1) * 6]);
+            triangles = new List<int>(new int[(planetData.meshResolution - 1) * (planetData.meshResolution - 1) * 6]);
 
             CalculateAverageUp();
         }
 
         //> CALCULATE THE AVERAGE DIRECTION OF THE CHUNK
-        public void CalculateAverageUp(float resolution = 4)
+        public void CalculateAverageUp(int resolution = 3)
         {
             //- Loop over every vertex
             for (int y = 0; y < resolution; y++) {
-                for (int x = 0; x < resolution; x++) {
+                for (int x = 0; x < resolution; x++)
+                {
                     Vector2 percent = (new Vector2(x, y) / (resolution - 1) * chunkPercent) + chunkOffset;
                     Vector3 position = Up + ((percent.x - 0.5f) * 2 * Right) + ((percent.y - 0.5f) * 2 * Forward);
                     
@@ -77,7 +78,6 @@ namespace TCM.Planets
                     averageUp += positionNormalized;
                 }
             }
-
             averageUp.Normalize();
         }
 
