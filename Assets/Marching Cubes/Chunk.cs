@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -10,24 +11,43 @@ namespace TCM.MarchingCubes
     [RequireComponent(typeof(MeshCollider))]
     public class Chunk : MonoBehaviour
     {
-        [SerializeField] private Material material;
-        
+
         private MeshRenderer meshRenderer;
         private MeshCollider meshCollider;
         private MeshFilter meshFilter;
+        private Material material;
         private Mesh mesh;
-        
-        private List<Vector3> vertices;
-        private List<int> triangles;
-        private List<float> values;
-        
 
-        private int resolution;
+        [SerializeField] public Vector4[] points;
+        [SerializeField] public Cell[] cells;
+
+        [SerializeField] private List<Vector3> vertices;
+        [SerializeField] private List<int> triangles;
+
+        private Vector3[] corners = new Vector3[8];
+
+        private float localZero, chunkPercent;
+        private int resolution, size;
+
+        private Vector3 index;
+        private Vector3 chunkOffset;
 
         //> INITIALIZATION
-        private void Initialize(int resolution, Vector3Int index)
+        public void Initialize(Vector3 index, int size, int chunkResolution, int resolution, float localZero, Material material)
         {
+            this.index = index;
+            
+            this.size = size;
+            this.localZero = localZero;
             this.resolution = resolution;
+            
+            this.material = material;
+            
+            this.chunkPercent = (1f / chunkResolution);
+            this.chunkOffset = (index / chunkResolution);
+            
+            triangles = new List<int>();
+            vertices = new List<Vector3>();
             
             this.meshFilter = GetComponent<MeshFilter>();
             this.meshRenderer = GetComponent<MeshRenderer>();
@@ -40,53 +60,167 @@ namespace TCM.MarchingCubes
                 indexFormat = IndexFormat.UInt32,
             };
 
-            vertices = new List<Vector3>(new Vector3[resolution * resolution * resolution]);
-            values = new List<float>(new float[resolution * resolution * resolution]);
-            triangles = new List<int>();
+            cells = new Cell[(resolution - 1) * (resolution - 1) * (resolution - 1)];
+            points = new Vector4[resolution * resolution * resolution];
+
+            BuildVertices();
+            BuildCells();
+            AssignChunkCorners();
+            // Polygonalize();
         }
 
-        private void Polygonalize(float localZero)
+        private void BuildVertices()
         {
             //- Loop over every vertex
-            for (int i = 0, t = 0, z = 0; (z < resolution - 1); z++) {
-                for (int y = 0; (y < resolution - 1); y++) {
-                    for (int x = 0; (x < resolution - 1); i++, x++)
+            for (int i = 0, y = 0; y < resolution; y++) {
+                for (int z = 0; z < resolution; z++) {
+                    for (int x = 0; x < resolution; i++, x++)
                     {
-                        float[] value = new float[8];
-                        Vector3[] edge = new Vector3[12];
-                        Vector3[] vertex = new Vector3[8];
+                        Vector3 percent = (new Vector3(x, y, z) / (resolution - 1) * chunkPercent) + chunkOffset;
+                        Vector3 position3D = (percent - 0.5f * Vector3.one) * size;
+                        Vector4 position4D = position3D;
+                        position4D.w = position3D.magnitude;
                         
-                        //- Determine the index into the edge table which tells us which vertices are inside of the surface
-                        int configuration = 0;
-                        if (values[0] < localZero) configuration |= 1;
-                        if (values[1] < localZero) configuration |= 2;
-                        if (values[2] < localZero) configuration |= 4;
-                        if (values[3] < localZero) configuration |= 8;
-                        if (values[4] < localZero) configuration |= 16;
-                        if (values[5] < localZero) configuration |= 32;
-                        if (values[6] < localZero) configuration |= 64;
-                        if (values[7] < localZero) configuration |= 128;
-                        
-                        //- Cube is entirely in/out of the surface
-                        if (MarchingCubes.EdgeTable[configuration] == 0) return;
-                        
-                        //- Find the vertices where the surface intersects the cube
-                        if ((MarchingCubes.EdgeTable[configuration] & 0001) == 1) edge[00] = MarchingCubes.Interpolate(localZero, vertex[0], vertex[1], value[0], value[1]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 0002) == 1) edge[01] = MarchingCubes.Interpolate(localZero, vertex[1], vertex[2], value[1], value[2]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 0004) == 1) edge[02] = MarchingCubes.Interpolate(localZero, vertex[2], vertex[3], value[2], value[3]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 0008) == 1) edge[03] = MarchingCubes.Interpolate(localZero, vertex[3], vertex[0], value[3], value[0]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 0016) == 1) edge[04] = MarchingCubes.Interpolate(localZero, vertex[4], vertex[5], value[4], value[5]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 0032) == 1) edge[05] = MarchingCubes.Interpolate(localZero, vertex[5], vertex[6], value[5], value[6]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 0064) == 1) edge[06] = MarchingCubes.Interpolate(localZero, vertex[6], vertex[7], value[6], value[7]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 0128) == 1) edge[07] = MarchingCubes.Interpolate(localZero, vertex[7], vertex[4], value[7], value[4]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 0256) == 1) edge[08] = MarchingCubes.Interpolate(localZero, vertex[0], vertex[4], value[0], value[4]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 0512) == 1) edge[09] = MarchingCubes.Interpolate(localZero, vertex[1], vertex[5], value[1], value[5]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 1024) == 1) edge[10] = MarchingCubes.Interpolate(localZero, vertex[2], vertex[6], value[2], value[6]);
-                        if ((MarchingCubes.EdgeTable[configuration] & 2048) == 1) edge[11] = MarchingCubes.Interpolate(localZero, vertex[3], vertex[7], value[3], value[7]);
-                        
+                        points[i] = position4D;
                     }
                 }
             }
+        }
+
+        private void AssignChunkCorners()
+        {
+            int r = resolution;
+            
+            corners[0] = points[  0  ];
+            corners[1] = points[ r-1 ];
+            corners[2] = points[r*r-r];
+            corners[3] = points[r*r-1];
+            
+            corners[4] = points[   r*r*(r-1)   ];
+            corners[5] = points[r*r*(r-1)+(r-1)];
+            corners[6] = points[    r*r*r-r    ];
+            corners[7] = points[    r*r*r-1    ];
+        }
+
+        private void BuildCells()
+        {
+            //- Loop over every vertex - 1
+            for (int i = 0, v = 0, y = 0; y < resolution - 1; y++, v += resolution) {
+                for (int z = 0; z < resolution - 1; z++, v++) {
+                    for (int x = 0; x < resolution - 1; i++, x++, v++)
+                    {
+                        cells[i] = new Cell { corner =
+                        {
+                            [0] = points[v + 0],
+                            [1] = points[v + 1],
+                            [2] = points[v + resolution + 1],
+                            [3] = points[v + resolution],
+                            [4] = points[v + resolution * resolution],
+                            [5] = points[v + resolution * resolution + 1],
+                            [6] = points[v + resolution * resolution + resolution + 1],
+                            [7] = points[v + resolution * resolution + resolution],
+                        }};
+                    }
+                }
+            }
+        }
+
+        public void Polygonalize()
+        {
+            vertices.Clear();
+            triangles.Clear();
+
+            foreach (var cell in cells)
+            {
+                var edges = MarchingCubes.GetVertices(cell, localZero);
+
+                if (edges == null) continue;
+
+                foreach (var v in edges)
+                {
+                    vertices.Add(v);
+                    triangles.Add(vertices.Count - 1);
+                }
+            }
+        }
+
+        public void Apply()
+        {
+            mesh.Clear();
+            mesh.vertices = vertices.ToArray();
+            mesh.triangles = triangles.ToArray();
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            // for (int index = 0; index < corners.Length; index++)
+            // {
+            //     // Gizmos.color = Color.Lerp(Color.white, Color.black, (float) index / vertices.Count);
+            //     Gizmos.color = Color.LerpUnclamped(Color.white, Color.black, corners[index].w);
+            //     Gizmos.DrawSphere(corners[index], 0.025f);
+            // }
+
+            // Gizmos.color = Color.red;
+            // foreach (var v in vertices)
+            // {
+            //     Gizmos.DrawSphere(v, 0.025f);
+            // }
+
+            // foreach (var v in cells.SelectMany(c => c.corner))
+            // {
+            //     Gizmos.DrawSphere(v, 0.15f);
+            // }
+            //
+            // foreach (var cell in cells)
+            // {
+            //     Gizmos.DrawLine(cell.corner[0], cell.corner[1]);
+            //     Gizmos.DrawLine(cell.corner[1], cell.corner[3]);
+            //     Gizmos.DrawLine(cell.corner[3], cell.corner[2]);
+            //     Gizmos.DrawLine(cell.corner[2], cell.corner[0]);
+            //     
+            //     Gizmos.DrawLine(cell.corner[0], cell.corner[4]);
+            //     Gizmos.DrawLine(cell.corner[1], cell.corner[5]);
+            //     Gizmos.DrawLine(cell.corner[3], cell.corner[7]);
+            //     Gizmos.DrawLine(cell.corner[2], cell.corner[6]);
+            //     
+            //     Gizmos.DrawLine(cell.corner[4], cell.corner[5]);
+            //     Gizmos.DrawLine(cell.corner[5], cell.corner[7]);
+            //     Gizmos.DrawLine(cell.corner[7], cell.corner[6]);
+            //     Gizmos.DrawLine(cell.corner[6], cell.corner[4]);
+            // }
+            //
+            // Gizmos.color = Color.red;
+            // foreach (var v in cells[cellChoice].corner)
+            // {
+            //     Gizmos.DrawSphere(v, 0.2f);
+            // }
+            
+            Gizmos.color = Color.white;
+            int r = resolution;
+            
+            Gizmos.DrawLine(corners[0], corners[1]);
+            Gizmos.DrawLine(corners[1], corners[3]);
+            Gizmos.DrawLine(corners[2], corners[3]);
+            Gizmos.DrawLine(corners[2], corners[0]);
+            
+            Gizmos.DrawLine(corners[0], corners[4]);
+            Gizmos.DrawLine(corners[1], corners[5]);
+            Gizmos.DrawLine(corners[2], corners[6]);
+            Gizmos.DrawLine(corners[3], corners[7]);
+            
+            Gizmos.DrawLine(corners[4], corners[5]);
+            Gizmos.DrawLine(corners[5], corners[7]);
+            Gizmos.DrawLine(corners[6], corners[7]);
+            Gizmos.DrawLine(corners[6], corners[4]);
+            
+            
+            
+            
+            // Gizmos.color = Color.green;
+            // Gizmos.DrawSphere(cellCorners[vertexChoice], 0.25f);
+            //
+            // Gizmos.color = Color.blue;
+            // Gizmos.DrawSphere(cells[cellChoice].corner[cellVertexChoice], 0.3f);
         }
     }
 }
