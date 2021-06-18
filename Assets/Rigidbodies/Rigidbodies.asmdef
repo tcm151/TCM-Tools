@@ -1,13 +1,12 @@
 {
-    "name": "TCM.Planets",
-    "rootNamespace": "TCM",
+    "name": "Rigidbodies",
+    "rootNamespace": "",
     "references": [
-        "GUID:9cd54bc674ca2f14aa769413dacf88b0",
-        "GUID:75469ad4d38634e559750d17036d5f7c"
+        "GUID:ec3a455d5dde4d0dbe7f1df8b3eb70b7"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": true,
+    "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,

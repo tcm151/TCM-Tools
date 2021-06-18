@@ -7,26 +7,38 @@ namespace TCM.Movement
 {
     public class FirstPersonView : MonoBehaviour
     {
-        public Transform player;
-        public Camera cam;
+        //+ COMPONENTS
+        new public Camera camera;
+        public Transform player, view;
         
-        public bool cameraLocked, invert = false;
+        //+ CONTROL DEVICES
+        private Mouse mouse;
+        private Keyboard keyboard;
+        
+        [Header("Settings")]
         public float mouseSensitivity;
-
-        public float Inverted => (invert) ? 1 : -1;
-
-        private Transform view;
-        private Vector2 input;
-        
-        [Header("Options")]
+        public bool invert;
         public bool lockOnPlay = true;
 
+        //- LOCAL VARIABLES
+        private bool cameraLocked;
+        private float Inverted => (invert) ? 1 : -1;
+        private Vector2 mouseInput;
+        
+        //> INITIALIZATION
         private void Awake()
         {
-            cameraLocked = lockOnPlay;
-            if (lockOnPlay) Cursor.lockState = CursorLockMode.Locked;
+            mouse = Mouse.current;
+            keyboard = Keyboard.current;
             
             view = transform;
+            cameraLocked = lockOnPlay;
+            if (lockOnPlay) Cursor.lockState = CursorLockMode.Locked;
+
+            mouseSensitivity = PlayerPrefs.GetFloat("mouseSensitivity", 1);
+            camera.fieldOfView = PlayerPrefs.GetFloat("fov", 90);
+            
+            
         }
 
         private void Update()
@@ -37,16 +49,16 @@ namespace TCM.Movement
             
             if (!cameraLocked) return;
             
-            float mouseX = Mouse.current.delta.x.ReadValue() * Time.deltaTime;
-            float mouseY = Mouse.current.delta.y.ReadValue() * Time.deltaTime * Inverted;
-            input = new Vector2(mouseX, mouseY) * mouseSensitivity;
-            
+            mouseInput.x = Mouse.current.delta.x.ReadValue();
+            mouseInput.y = Mouse.current.delta.y.ReadValue() * Inverted;
+            mouseInput *= mouseSensitivity * Time.deltaTime;
+
         }
 
         private void LateUpdate()
         {
-            view.localRotation *= Quaternion.AngleAxis(input.y, Vector3.right);
-            player.rotation *= Quaternion.AngleAxis(input.x, Vector3.up);
+            view.localRotation *= Quaternion.AngleAxis(mouseInput.y, Vector3.right);
+            player.rotation *= Quaternion.AngleAxis(mouseInput.x, Vector3.up);
         }
 
         //> TOGGLE LOCK CURSOR TO WINDOW
@@ -65,13 +77,5 @@ namespace TCM.Movement
                 Cursor.visible = true;
             }
         }
-
-        public void SetMouseSensitivity(float sens) => mouseSensitivity = sens;
-
-        public void SetFOV(float fov) => cam.fieldOfView = fov;
-
-        public void SetInvertMouse(bool truth) => invert = truth;
-
-        public Vector3 CameraRelative(Vector3 v) => v = view.TransformDirection(v);
     }
 }
