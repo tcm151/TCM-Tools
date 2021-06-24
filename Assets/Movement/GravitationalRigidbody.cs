@@ -8,7 +8,7 @@ namespace TCM.Movement
     {
         private float delay;
         new private Rigidbody rigidbody;
-        [SerializeField] private bool canSleep = false;
+        [SerializeField] private bool canSleep;
 
         //> INITIALIZATION
         private void Awake()

@@ -2,9 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using TCM.Tools;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
+using TCM.Tools;
+using TCM.NoiseGeneration;
 
 namespace TCM.Planets
 {
@@ -19,9 +20,9 @@ namespace TCM.Planets
             public Material material;
             public Gradient terrainGradient;
             public Gradient underwaterGradient;
-            public int textureResolution = 64;
+            public int textureResolution = 16;
 
-            [Header("Shape")] public int radius = 150;
+            [Header("Shape")] public int radius = 5215;
             public List<Noise.Layer> noiseLayers;
             
             [Header("Mesh Generation")]

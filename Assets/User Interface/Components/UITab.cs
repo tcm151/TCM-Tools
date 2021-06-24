@@ -1,4 +1,4 @@
-﻿namespace EasyMesh.UI
+﻿namespace ProceduralMesh.UI
 {
     public class UITab
     {

@@ -2,7 +2,9 @@
     "name": "TCM.Planets",
     "rootNamespace": "TCM",
     "references": [
+        "GUID:d756382cc2dd5cd4f87a1ed75040a5ee",
         "GUID:9cd54bc674ca2f14aa769413dacf88b0",
+        "GUID:16663f236000d0c44a2884cbaa5792d4",
         "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],

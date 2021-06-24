@@ -11,11 +11,10 @@ namespace UI
         [SerializeReference] private Image fillImage;
         [SerializeReference] private RectMask2D fillMask;
 
-
         private Rect rect;
         private float width, step;
 
-        public float min = 0f, max = 100f;
+        public float min, max = 100f;
         public float value {get; private set;}
 
         //> INITIALIZATION

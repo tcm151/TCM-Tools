@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 
-namespace TCM.Planets.Generation
+namespace TCM.Planets.NoiseGeneration
 {
     public class TerrainProfileUI : MonoBehaviour
     {
