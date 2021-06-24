@@ -9,6 +9,29 @@ namespace TCM.MarchingCubes
     {
         public Vector4[] corner = new Vector4[8];
         // public float[] value = new float[8];
+        
+        public void DrawGizmo(Color color)
+        {
+            Gizmos.color = color;
+            
+            // Bottom Square
+            Gizmos.DrawLine(corner[0], corner[1]);
+            Gizmos.DrawLine(corner[1], corner[3]);
+            Gizmos.DrawLine(corner[2], corner[3]);
+            Gizmos.DrawLine(corner[2], corner[0]);
+
+            // Middle Posts
+            Gizmos.DrawLine(corner[0], corner[4]);
+            Gizmos.DrawLine(corner[1], corner[5]);
+            Gizmos.DrawLine(corner[2], corner[6]);
+            Gizmos.DrawLine(corner[3], corner[7]);
+
+            // Top Square
+            Gizmos.DrawLine(corner[4], corner[5]);
+            Gizmos.DrawLine(corner[5], corner[7]);
+            Gizmos.DrawLine(corner[6], corner[7]);
+            Gizmos.DrawLine(corner[6], corner[4]);
+        }
     }
     
     public static class MarchingCubes
