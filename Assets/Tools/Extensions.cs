@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 
 namespace TCM.Tools
@@ -24,6 +23,6 @@ namespace TCM.Tools
         public static float Remap(float inMin, float inMax, float outMin, float outMax, float v) => Lerp(outMin, outMax, InverseLerp(inMin, inMax, v));
 
         public static Vector3Int FloorToInt(this Vector3 v) => new Vector3Int {x = Mathf.FloorToInt(v.x), y = Mathf.FloorToInt(v.y), z = Mathf.FloorToInt(v.z)};
-
+        
     }
 }

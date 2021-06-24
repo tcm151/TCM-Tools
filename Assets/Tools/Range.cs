@@ -7,15 +7,13 @@ namespace TCM.Tools
     public class Range
     {
         public float min {get; private set;}
-        public float lowerBound => min;
         public float max {get; private set;}
-        public float upperBound => max;
 
         //> EMPTY CONSTRUCTOR
         public Range()
         {
-            min = float.MaxValue;
-            max = float.MinValue;
+            min = 999999999;
+            max = -999999999;
         }
 
         //> DEFINED RANGE CONSTRUCTOR
