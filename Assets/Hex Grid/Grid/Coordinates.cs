@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace HexMap
+namespace TCM.HexGrid
 {
     [System.Serializable]
     public struct Coordinates

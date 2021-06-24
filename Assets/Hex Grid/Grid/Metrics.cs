@@ -2,7 +2,7 @@
 using UnityEngine;
 
 
-namespace HexMap
+namespace TCM.HexGrid
 {
     public static class Metrics
     {

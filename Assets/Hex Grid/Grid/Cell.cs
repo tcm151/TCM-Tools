@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine;
 
 
-namespace HexMap
+namespace TCM.HexGrid
 {
     public class Cell : MonoBehaviour
     {

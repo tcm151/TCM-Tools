@@ -2,7 +2,7 @@
 using UnityEngine;
 
 
-namespace HexMap.UI
+namespace TCM.HexGrid.UI
 {
     public class NewMap : MonoBehaviour
     {

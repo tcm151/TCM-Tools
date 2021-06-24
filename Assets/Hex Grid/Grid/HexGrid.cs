@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.IO;
 
-namespace HexMap
+namespace TCM.HexGrid
 {
     [RequireComponent(typeof(MeshRenderer))]
     public class HexGrid : MonoBehaviour
@@ -41,7 +41,7 @@ namespace HexMap
             }
 
             // clear the map data if one already exists
-            if (chunks != null)
+            if (chunks is { })
             {
                 foreach (Chunk chunk in chunks) Destroy(chunk.gameObject);
             }

@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 
 
-namespace HexMap.UI
+namespace TCM.HexGrid.UI
 {
     public class SaveLoadEntry : MonoBehaviour
     {

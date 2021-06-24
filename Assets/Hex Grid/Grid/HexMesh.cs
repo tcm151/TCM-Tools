@@ -2,7 +2,7 @@
 using UnityEngine;
 
 
-namespace HexMap
+namespace TCM.HexGrid
 {
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
@@ -132,7 +132,7 @@ namespace HexMap
             Triangles.Add(vertexIndex + 3);
         }
 
-        //> INTERPOLATE QUADS COLOR FANCY
+        //> INTERPOLATE QUAD COLOR FANCY
         private void AddQuadColor(Color c1, Color c2, Color c3, Color c4)
         {
             Colors.Add(c1);
@@ -141,7 +141,7 @@ namespace HexMap
             Colors.Add(c4);
         }
 
-        //> INTERPOLATE QUADS COLOR SIMPLE
+        //> INTERPOLATE QUAD COLOR SIMPLE
         private static void AddQuadColor(Color c1, Color c2)
         {
             Colors.Add(c1);

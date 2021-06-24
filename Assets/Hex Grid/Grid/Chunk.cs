@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 
-namespace HexMap
+namespace TCM.HexGrid
 {
     public class Chunk : MonoBehaviour
     {

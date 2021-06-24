@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 
-namespace HexMap.UI
+namespace TCM.HexGrid.UI
 {
     public class MapEditorPanel : UIPanel
     {
