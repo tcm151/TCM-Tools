@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace EasyMesh
+namespace ProceduralMesh
 {
     public class MeshEditorCamera : MonoBehaviour
     {

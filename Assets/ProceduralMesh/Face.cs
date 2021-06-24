@@ -1,5 +1,5 @@
 
-namespace EasyMesh
+namespace ProceduralMesh
 {
     public class Face
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-namespace EasyMesh
+namespace ProceduralMesh
 {
     public struct Vertex
     {
