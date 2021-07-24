@@ -163,7 +163,7 @@ namespace TCM.Planets
         //> APPLY TRIANGULATION TO MESH
         public void Apply()
         {
-            // Debug.Log($"{vertices.ToArray().Length}, {normals.ToArray().Length}, {triangles.ToArray().Length}");
+            // Debug.Log($"{points.ToArray().Length}, {normals.ToArray().Length}, {triangles.ToArray().Length}");
             
             mesh.Clear();
             mesh.vertices = vertices.ToArray();

@@ -5,14 +5,14 @@ using UnityEditor;
 namespace TCM.Planets
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(WirePlanet))]
+    [CustomEditor(typeof(ChunkedSpherePlanet))]
     public class WirePlanetInspector : Editor
     {
-        private WirePlanet planet;
+        private ChunkedSpherePlanet planet;
         private bool autoUpdate;
         
         //> ON ENABLE
-        private void OnEnable() => planet = target as WirePlanet;
+        private void OnEnable() => planet = target as ChunkedSpherePlanet;
 
         //> INSPECTOR GUI
         override public void OnInspectorGUI()

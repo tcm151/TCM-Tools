@@ -29,7 +29,7 @@
 //             };
 //             
 //             homePlanet = new GameObject("HomePlanet").AddComponent<Planet>();
-//             homePlanet.planetData = newPlanetData;
+//             homePlanet.data = newPlanetData;
 //
 //
 //             homePlanet.GeneratePlanet(true);
