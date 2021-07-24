@@ -3,7 +3,6 @@
     "rootNamespace": "TCM",
     "references": [
         "GUID:9cd54bc674ca2f14aa769413dacf88b0",
-        "GUID:adb13f266ca79c84f8aed5c2e8100731",
         "GUID:16663f236000d0c44a2884cbaa5792d4"
     ],
     "includePlatforms": [],

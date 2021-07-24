@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 
 
-namespace TCM.MarchingCubes
+namespace MarchedRendering
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(ChunkGrid))]

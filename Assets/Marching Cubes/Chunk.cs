@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using TCM.Tools;
 using TCM.NoiseGeneration;
 
 
-namespace TCM.MarchingCubes
+namespace MarchedRendering
 {
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
@@ -21,7 +20,7 @@ namespace TCM.MarchingCubes
         private Cell outside;
         private float chunkPercent;
         private Vector3 chunkOffset;
-        private ChunkGrid.Data chunk;
+        private ChunkGrid.Data data;
 
         public Range noiseRange;
         
@@ -34,7 +33,7 @@ namespace TCM.MarchingCubes
         //> INITIALIZATION
         public void Initialize(Vector3 index, ChunkGrid.Data data)
         {
-            this.chunk = data;
+            this.data = data;
 
             this.noiseRange = new Range();
 
@@ -66,12 +65,12 @@ namespace TCM.MarchingCubes
         private void BuildVertices()
         {
             //- Loop over every vertex
-            for (int i = 0, y = 0; y < chunk.meshResolution; y++) {
-                for (int z = 0; z < chunk.meshResolution; z++) {
-                    for (int x = 0; x < chunk.meshResolution; i++, x++)
+            for (int i = 0, y = 0; y < data.meshResolution; y++) {
+                for (int z = 0; z < data.meshResolution; z++) {
+                    for (int x = 0; x < data.meshResolution; i++, x++)
                     {
-                        Vector3 percent = (new Vector3(x, y, z) / (chunk.meshResolution - 1) * chunkPercent) + chunkOffset;
-                        Vector3 position3D = (percent - 0.5f * Vector3.one) * chunk.radius;
+                        Vector3 percent = (new Vector3(x, y, z) / (data.meshResolution - 1) * chunkPercent) + chunkOffset;
+                        Vector3 position3D = (percent - 0.5f * Vector3.one) * data.radius;
                         Vector4 position4D = position3D;
                         position4D.w = GetElevation(position3D);
                         points[i] = position4D;
@@ -82,20 +81,43 @@ namespace TCM.MarchingCubes
 
         private float GetElevation(Vector3 position3D)
         {
-            position3D /= chunk.radius;
+            position3D /= data.radius;
             // position3D.Normalize();
             
             float value = position3D.magnitude;
-            // value += Noise.GenerateValue(chunk.noiseLayers[0], position3D);
-            value += Noise.GenerateValue(chunk.noiseLayers[0], position3D);
+            // value += Noise.GenerateValue(data.noiseLayers[0], position3D);
+            value += Noise.GenerateValue(data.noiseLayers[0], position3D);
             
             noiseRange.Add(value);
             return value;
         }
 
+        private void BuildCells()
+        {
+            //- Loop over every vertex - 1
+            for (int i = 0, v = 0, y = 0; y < data.meshResolution - 1; y++, v += data.meshResolution) {
+                for (int z = 0; z < data.meshResolution - 1; z++, v++) {
+                    for (int x = 0; x < data.meshResolution - 1; i++, x++, v++)
+                    {
+                        cells[i] = new Cell { corner =
+                        {
+                            [0] = points[v + 0],
+                            [1] = points[v + 1],
+                            [2] = points[v + data.meshResolution + 1],
+                            [3] = points[v + data.meshResolution],
+                            [4] = points[v + data.meshResolution * data.meshResolution],
+                            [5] = points[v + data.meshResolution * data.meshResolution + 1],
+                            [6] = points[v + data.meshResolution * data.meshResolution + data.meshResolution + 1],
+                            [7] = points[v + data.meshResolution * data.meshResolution + data.meshResolution],
+                        }};
+                    }
+                }
+            }
+        }
+        
         private void GetChunkCorners()
         {
-            int r = chunk.meshResolution;
+            int r = data.meshResolution;
             outside = new Cell { corner =
                 {
                     [0] = points[  0  ],
@@ -111,29 +133,6 @@ namespace TCM.MarchingCubes
             };
         }
 
-        private void BuildCells()
-        {
-            //- Loop over every vertex - 1
-            for (int i = 0, v = 0, y = 0; y < chunk.meshResolution - 1; y++, v += chunk.meshResolution) {
-                for (int z = 0; z < chunk.meshResolution - 1; z++, v++) {
-                    for (int x = 0; x < chunk.meshResolution - 1; i++, x++, v++)
-                    {
-                        cells[i] = new Cell { corner =
-                        {
-                            [0] = points[v + 0],
-                            [1] = points[v + 1],
-                            [2] = points[v + chunk.meshResolution + 1],
-                            [3] = points[v + chunk.meshResolution],
-                            [4] = points[v + chunk.meshResolution * chunk.meshResolution],
-                            [5] = points[v + chunk.meshResolution * chunk.meshResolution + 1],
-                            [6] = points[v + chunk.meshResolution * chunk.meshResolution + chunk.meshResolution + 1],
-                            [7] = points[v + chunk.meshResolution * chunk.meshResolution + chunk.meshResolution],
-                        }};
-                    }
-                }
-            }
-        }
-
         public void Polygonalize()
         {
             vertices.Clear();
@@ -141,7 +140,7 @@ namespace TCM.MarchingCubes
 
             foreach (var cell in cells)
             {
-                var edges = MarchingCubes.GetVertices(cell, chunk.localZero);
+                var edges = MarchingCubes.GetVertices(cell, data.localZero);
 
                 if (edges == null) continue;
 
@@ -163,13 +162,13 @@ namespace TCM.MarchingCubes
         private void OnDrawGizmosSelected()
         {
             //+ DRAW CHUNK BOUNDARY
-            outside.DrawGizmo(Color.white);
+            outside.DrawGizmo(Color.blue);
 
             //+ DRAW ALL CELL VERTICES
             // foreach (var v in cells.SelectMany(c => c.corner)) Gizmos.DrawSphere(v, 0.15f);
 
             //+ DRAW ALL CELL EDGES
-            // foreach (var c in cells) DrawGizmo(c, Color.gray);
+            foreach (var c in cells) c.DrawGizmo(Color.gray);
         }
     }
 }

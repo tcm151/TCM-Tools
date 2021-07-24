@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace TCM.MarchingCubes
+namespace MarchedRendering
 {
     //> GRID CELL STRUCT FOR MARCHING THRU CHUNK
     [System.Serializable] public class Cell
@@ -25,7 +25,7 @@ namespace TCM.MarchingCubes
             Gizmos.DrawLine(corner[1], corner[5]);
             Gizmos.DrawLine(corner[2], corner[6]);
             Gizmos.DrawLine(corner[3], corner[7]);
-
+            
             // Top Square
             Gizmos.DrawLine(corner[4], corner[5]);
             Gizmos.DrawLine(corner[5], corner[7]);

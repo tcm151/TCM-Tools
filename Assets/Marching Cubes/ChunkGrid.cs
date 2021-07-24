@@ -7,7 +7,7 @@ using TCM.NoiseGeneration;
 using TCM.Tools;
 
 
-namespace TCM.MarchingCubes
+namespace MarchedRendering
 {
     public class ChunkGrid : MonoBehaviour
     {
@@ -19,7 +19,7 @@ namespace TCM.MarchingCubes
             
             [Header("Mesh Generation")]
             [Range(500, 2500)] public int radius = 1000;
-            [Range(008, 0064)] public int meshResolution = 16;
+            [Range(002, 0064)] public int meshResolution = 16;
             [Range(001, 0008)] public int chunkResolution = 2;
 
             [Header("Noise")]
