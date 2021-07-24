@@ -9,14 +9,12 @@ namespace TCM.NoiseGeneration
         public enum Type { Simple, Rigid };
 
         //> NOISE LAYER SETTINGS
-        [System.Serializable]
-        public class Layer
+        [System.Serializable] public class Layer
         {
             public bool enabled = true;
             public bool useMask = true;
 
             public Type noiseType;
-
             public SimplexNoise generator = new SimplexNoise();
 
             [Range( 1,  8)] public int octaves = 1;
@@ -25,7 +23,6 @@ namespace TCM.NoiseGeneration
             [Range( 0, 15)] public float roughness = 2f;
             [Range( 0,  5)] public float persistence = 0.5f;
             [Range(-5,  5)] public float localZero = 0f;
-
             public Vector3 offset = Vector3.zero;
         }
 
