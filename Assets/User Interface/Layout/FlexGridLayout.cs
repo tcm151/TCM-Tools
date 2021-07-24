@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-namespace TCM
+namespace TCM.UI
 {
     public class FlexGridLayout : LayoutGroup
     {
@@ -40,13 +40,13 @@ namespace TCM
 
             var rect = rectTransform.rect;
             
-            float cellHeight = (rect.height / (float)rows) 
-                             - ((spacing.y / (float)rows) * (rows - 1))
+            float cellHeight = (rect.height / rows) 
+                             - ((spacing.y / rows) * (rows - 1))
                              - (padding.top / (float)rows)
                              - (padding.bottom / (float)rows);
             
-            float cellWidth = (rect.width / (float)columns)
-                            - ((spacing.x / (float)columns) * (columns - 1))
+            float cellWidth = (rect.width / columns)
+                            - ((spacing.x / columns) * (columns - 1))
                             - (padding.left / (float)columns)
                             - (padding.right / (float)columns);
 

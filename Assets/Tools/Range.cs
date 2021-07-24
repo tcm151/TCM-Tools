@@ -34,8 +34,8 @@ namespace TCM.Tools
         public bool Contains(float value) => (value >= min && value <= max);
 
         //> ADD RANGES TOGETHER
-        public static Range operator +(Range rangeA, Range rangeB) =>
-            new Range
+        public static Range operator +(Range rangeA, Range rangeB)
+            => new Range
             {
                 min = Mathf.Min(rangeA.min, rangeB.min),
                 max = Mathf.Max(rangeA.max, rangeB.max),

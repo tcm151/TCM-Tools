@@ -2,7 +2,7 @@
 using UnityEditor;
 
 
-namespace TCM.UI
+namespace TCM
 {
     //> PLACEHOLDER
     public class Stat { }

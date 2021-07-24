@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 
 
-namespace UI
+namespace TCM.UI
 {
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(CanvasGroup))]
