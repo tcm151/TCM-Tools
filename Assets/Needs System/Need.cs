@@ -5,47 +5,41 @@ using UnityEngine;
 
 public class Need
 {
-    public float value;
-    float MAX, MIN = 0.0f;
-    bool running = false;
+    private float value;
+    private readonly float max;
+    // private float min = 0.0f;
+    private bool running;
 
     public Need(float max)
     {
-        MAX = max;
+        this.max = max;
         value = max;
     }
 
-    public bool start()
+    public bool Start()
     {
-        if (!running)
-        {
-            running = true;
-            return true;
-        }
-        return false;
+        if (running) return false;
+        
+        running = true;
+        return true;
     }
-    public bool stop()
+    public bool Stop()
     {
-        if (running)
-        {
-            running = false;
-            return true;
-        }
-        return false;
+        if (!running) return false;
+        
+        running = false;
+        return true;
     }
 
-    public void update(float offset = 1f)
-    {
-        value -= offset;
-    }
+    public void Update(float offset = 1f) => value -= offset;
 
-    public void add(float v)
+    public void Add(float v)
     {
         value += v;
-        Mathf.Clamp(value, 0f, MAX);
+        Mathf.Clamp(value, 0f, max);
     }
 
-    public bool isRunning() => running;
-    public float get() => value / MAX * 10;
-    public void set(float v) => value = v;
+    public bool IsRunning() => running;
+    public float Get() => value / max * 10;
+    public void Set(float v) => value = v;
 }

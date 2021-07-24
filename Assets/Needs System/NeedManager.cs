@@ -19,24 +19,24 @@ public class NeedManager : MonoBehaviour
 
     public void consume(Consumable item)
     {
-        health.update(item.healthModifer);
-        thirst.update(item.thirstModifier);
-         sleep.update(item.sleepModifier);
-        mental.update(item.mentalModifier);
-        hunger.update(item.hungerModifier);
+        health.Update(item.healthModifer);
+        thirst.Update(item.thirstModifier);
+         sleep.Update(item.sleepModifier);
+        mental.Update(item.mentalModifier);
+        hunger.Update(item.hungerModifier);
     }
 
-    float currentHealth() => (hunger.get() + sleep.get() + thirst.get()) / 3;
+    float currentHealth() => (hunger.Get() + sleep.Get() + thirst.Get()) / 3;
 
 
 
     void print()
     {
         string s = "";
-        s += "| HEALTH: " + health.get().ToString("F1") + " ";
-        s += "| THIRST: " + thirst.get().ToString("F1") + " ";
-        s += "| SLEEP: "  +  sleep.get().ToString("F1") + " ";
-        s += "| HUNGER: " + hunger.get().ToString("F1") + " |";
+        s += "| HEALTH: " + health.Get().ToString("F1") + " ";
+        s += "| THIRST: " + thirst.Get().ToString("F1") + " ";
+        s += "| SLEEP: "  +  sleep.Get().ToString("F1") + " ";
+        s += "| HUNGER: " + hunger.Get().ToString("F1") + " |";
         Debug.Log(s);
     }
 
@@ -53,15 +53,15 @@ public class NeedManager : MonoBehaviour
     {
         if (++i >= UPDATE_INTERVAL && !dead)
         {
-            hunger.update();
-             sleep.update();
-            thirst.update();
-            health.set(currentHealth());
+            hunger.Update();
+             sleep.Update();
+            thirst.Update();
+            health.Set(currentHealth());
             i = 0;
 
             print();
 
-            if (health.get() < 0 || thirst.get() < 0 || sleep.get() < 0 || hunger.get() < 0)
+            if (health.Get() < 0 || thirst.Get() < 0 || sleep.Get() < 0 || hunger.Get() < 0)
                 youDied();
         }
     }
